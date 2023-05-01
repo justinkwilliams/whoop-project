@@ -16,16 +16,16 @@ def read_data(path):
     return df
 
 
-def clean_dataframe(df: pd.DataFrame, date_col: pd.Series, drop_cols: list, drop_na_rows: list, start_date: str, end_date: str):
+def clean_dataframe(df: pd.DataFrame, date_col: pd.Series, drop_cols: list = None, drop_na_rows: list = None, start_date: str = None, end_date: str = None):
     """ Creates a new dataframe by converting 'date' column to datetime object, adding day of the week column as category, dropping unnecessary columns, removing specific rows with missing data, adding starting and end dates and removing spaces and captial letters in column labels.
 
     Args:
         df (pd.DataFrame): The Dataframe to clean.
         date_column: (pd.Series): Column containg the date
-        drop_col (list): List containing the column names of columns to drop.
-        drop_na_rows (list): List containing the columns names with NaN values. Rows with NaN values in these columns will be dropped.
-        start_date (str): The date to start the DataFrame on
-        end_date (str): The date to end the DataFrame on
+        drop_col (list, optional): List containing the column names of columns to drop. Defaults to None.
+        drop_na_rows (list, optional): List containing the columns names with NaN values. Rows with NaN values in these columns will be dropped. Defaults to None.
+        start_date (str, optional): The date to start the DataFrame on. Defaults to None.
+        end_date (str, optional): The date to end the DataFrame on. Defaults to None.
     Returns:
         pd.Dataframe: Updated, clean dataframe.
     """
@@ -38,6 +38,26 @@ def clean_dataframe(df: pd.DataFrame, date_col: pd.Series, drop_cols: list, drop
         column_map = {col: col.lower().replace(" ", "_")}
         df_clean = df_clean.rename(columns=column_map)
     return df_clean
+
+# or version 2
+
+
+def plot_missing_data(df: pd.DataFrame):
+    """Plots the number of rows with missing data for each column in a DataFrame
+
+    Args:
+        df (pd.DataFrame): Dataframe to print missing values from
+    Return:
+        A plot of the missing values
+    """
+    missing_data = df.isnull().sum()
+    fig, ax = plt.subplots()
+    ax.bar(missing_data.index, missing_data.values)
+    ax.set_title('Number of Rows with Missing Data')
+    ax.set_xlabel('Column Name')
+    ax.set_ylabel('Number of Rows')
+    plt.xticks(rotation=90)
+    plt.show()
 
 
 def fill_missing_values(df: pd.DataFrame, col_list: list):
