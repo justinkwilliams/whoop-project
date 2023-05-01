@@ -1,0 +1,85 @@
+import datetime
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from scipy.stats import shapiro
+
+if __name__ == '__main__':
+    def read_data(path):
+        """Read in whoop data
+
+        Args:
+        path (str): location of file on disk
+        """
+        df = pd.read_csv(path)
+        return df
+
+    # read in DataFrame, remove unused columns, pick specific dates
+    df = read_data(
+        '/Users/user/Downloads/2023-04-27_Habit_Dash_Whoop_Data/Habit Dash - Integrations (whoop_clean).csv')
+
+    # convert 'Date' column to datetime and create a 'day_of_week' column
+    df['Date'] = pd.to_datetime(df['Date'])
+    df['Day of Week'] = df['Date'].dt.day_name()
+    print(df['Day of Week'].head())
+
+    # Remove unnecessary columns and set df to only deal with 2022
+    df_clean = df.drop(['Skin Temperature', 'Blood Oxygenation'], axis=1).dropna(
+        subset=['Strain Score', 'Recovery Score'], axis=0)
+    df_2022 = df_clean.loc[(df_clean['Date'] >= '2022-01-01')
+                           & (df_clean['Date'] < '2023-01-01')]
+
+    # Deal with missing values in sleep consistency
+    plt.hist(df_2022['Sleep Consistency'])
+    print(df_2022['Sleep Consistency'].mean())
+    print(df_2022['Sleep Consistency'].skew())
+    df_2022['Sleep Consistency'] = df_2022['Sleep Consistency'].fillna(
+        df_2022['Sleep Consistency'].mean())
+
+    def impute_mean(df: pd.DataFrame, col_list: list):
+        """"Fills missing values of a column with the mean in normally distributed determined by using Shapiro-Wilk test.
+
+        Args:
+            df (pd.DataFrame): DataFrame with columns.
+            col_list (list): List of columns with missing data.
+
+        Returns:
+            pd.DataFrame: Modified DataFrame with filled missing values.
+        """
+
+        for col in col_list:
+            W, p = shapiro(df[col].dropna())
+            if p > 0.05:
+                df[col] = df[col].fillna(df[col].mean())
+            else:
+                print(col + " is not normally distributed")
+        return df
+
+    # Add "Recovery Level Cat" column to DataFrame
+    df_2022['Recovery Level Cat'] = pd.cut(df['Recovery Score'], bins=[
+                                           0, 33, 66, 100], labels=['red', 'yellow', 'green']).astype('category')
+    print(df_2022['Recovery Level Cat'].dtype)
+    print(df_2022.dtypes)
+
+   # Convert "Nap Count" column to bool and just "Nap"
+    df_2022['Nap Count'] = df_2022['Nap Count'].fillna(0)
+    df_2022['Nap'] = (df_2022['Nap Count'] >= 1).astype(bool)
+    print(df_2022['Nap'].value_counts)
+    print(df_2022.dtypes)
+
+    # Confirm that DataFrame looks as expected
+    print(df_2022.shape)
+    missing_values_count = df_2022.isnull().sum(axis=0)
+    print(missing_values_count)
+
+    # Using groupby to see average strain score for each Recovery Level
+    print(df_2022.groupby('Recovery Level Cat')['Strain Score'].apply(np.mean))
+
+    # Using group by to see average recovery score for each day of the week
+    print(df_2022.groupby('Day of Week')['Recovery Score'].mean())
+
+    # Using .map to create a numerical value for recovery level
+    df_2022['Recovery Level Num'] = df_2022['Recovery Level Cat'].map(
+        {'red': 0, 'yellow': 1, 'green': 2})
+    print(df_2022['Recovery Level Num'].head())
