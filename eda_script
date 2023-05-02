@@ -1,0 +1,18 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+
+from clean_functions import read_data
+
+if __name__ == '__main__':
+
+    # Using groupby to see average strain score for each Recovery Level
+    print(df_2022.groupby('Recovery Level Cat')
+          ['Strain Score'].apply(np.mean))
+
+    # Using group by to see average recovery score for each day of the week
+    print(df_2022.groupby('Day of Week')['Recovery Score'].mean())
+
+    # Using .map to create a numerical value for recovery level
+    df_2022['Recovery Level Num'] = df_2022['Recovery Level Cat'].map(
+        {'red': 0, 'yellow': 1, 'green': 2})
+    print(df_2022['Recovery Level Num'].head())

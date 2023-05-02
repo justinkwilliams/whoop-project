@@ -1,5 +1,5 @@
 {
-    "python.defaultInterpreterPath": "/Users/arthur/teaching/fast_ds/venv/bin/python",
+    "python.defaultInterpreterPath": "/opt/anaconda3/envs/whoop_project/bin/python",
     "workbench.colorCustomizations": {
         "activityBar.background": "#599d15"
     },
@@ -7,5 +7,5 @@
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
         "source.organizeImports": true
-    }
+    },
 }
