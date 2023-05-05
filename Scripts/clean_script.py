@@ -1,4 +1,4 @@
-import clean_functions as cf
+import whoop_project.clean_functions as cf
 
 # Read in csv file
 df = cf.read_data(

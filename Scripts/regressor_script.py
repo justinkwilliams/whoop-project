@@ -1,5 +1,5 @@
-import xgboost_regressor as xg
-from clean_functions import read_data
+import whoop_project.xgboost_regressor as xg
+from whoop_project.clean_functions import read_data
 
 # Load in clean data
 df = read_data(
