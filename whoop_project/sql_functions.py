@@ -4,17 +4,17 @@ import pandas as pd
 import sqlalchemy
 
 
-def create_raw_table(path_to_csv: str, path_to_db: str, table_name: str, dtypes: dict = None):
+def create_raw_table(path_to_csv: str, path_name_to_db: str, table_name: str, dtypes: dict = None):
     """"Converts a csv to a DataFrame and then converts the DataFrame to a sql table.
 
     Args:
         path_to_csv (str): File path to csv file to convert.
-        path_to_db (str): File path to database to add table.
+        path_to_db (str): File path to database followed by name for the database.
         table_name (str): Name of created table.
         dtypes (dict, optional): Dictionary filled with column names as keys and desired sql datatypes as values. Defaults to None.
     """
     df = pd.read_csv(path_to_csv, dtype=dtypes)
-    engine = sqlalchemy.create_engine(f"sqlite:///{path_to_db}")
+    engine = sqlalchemy.create_engine(f"sqlite:///{path_name_to_db}")
     df.to_sql(table_name, engine, if_exists="replace", index=False)
 
 
