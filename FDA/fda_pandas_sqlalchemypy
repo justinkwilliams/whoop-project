@@ -1,0 +1,71 @@
+import pandas as pd
+import sqlalchemy
+
+# Create sqlalchemy engine
+engine = sqlalchemy.create_engine(
+    'sqlite:////Users/user/Desktop/Real Whoop Project/whoop_project/Data/fda_sqlalchemy.db')
+
+# Load the data from the CSV file
+df = pd.read_csv(
+    'https://raw.githubusercontent.com/asugden/fast_ds/4db314b9c92adfb2f306c3d8ba745d32fd77ebca/data/fda_data.csv')
+
+# Create raw table
+df.to_sql('raw', engine, index=False, if_exists='replace')
+
+# Create companies table
+engine.execute(
+    'CREATE TABLE IF NOT EXISTS companies (id INTEGER PRIMARY KEY, company_name VARCHAR(90) UNIQUE NOT NULL)')
+
+# Create proper_drug table
+engine.execute('CREATE TABLE IF NOT EXISTS proper_drug (id INTEGER PRIMARY KEY,drug_proper_name VARCHAR(250) UNIQUE NOT NULL,company_id INTEGER REFERENCES companies (id))')
+
+# Create proprietary_drug table
+engine.execute('CREATE TABLE IF NOT EXISTS proprietary_drug (id INTEGER PRIMARY KEY, drug_proprietary_name VARCHAR(100) UNIQUE NOT NULL, proper_drug_id INTEGER REFERENCES proper_drug (id))')
+
+# Insert into companies
+engine.execute(
+    'INSERT OR IGNORE INTO companies (company_name) SELECT applicant FROM raw')
+
+# Insert into proper_drug
+engine.execute('INSERT OR IGNORE INTO proper_drug (drug_proper_name, company_id) SELECT proper_name, comp.id FROM raw JOIN companies as comp ON comp.company_name = CAST (raw.applicant AS VARCHAR(90))')
+
+# Insert into proprietary_drug
+engine.execute('INSERT OR IGNORE INTO proprietary_drug (drug_proprietary_name, proper_drug_id) SELECT proprietary_name, ppd.id FROM raw JOIN proper_drug as ppd ON ppd.drug_proper_name = CAST (raw.proper_name AS VARCHAR(250))')
+
+
+# create_companies = 'CREATE TABLE IF NOT EXISTS companies (id INTEGER PRIMARY KEY,company_name VARCHAR(90) UNIQUE NOT NULL)'
+
+# create_proper = 'CREATE TABLE IF NOT EXISTS proper_drug (id INTEGER PRIMARY KEY,drug_proper_name VARCHAR(250) UNIQUE NOT NULL,company_id INTEGER REFERENCES companies (id))'
+
+# create_proprietary = 'CREATE TABLE IF NOT EXISTS proprietary_drug (id INTEGER PRIMARY KEY, drug_proprietary_name VARCHAR(100) UNIQUE NOT NULL, proper_drug_id INTEGER REFERENCES proper_drug (id))'
+
+# insert_into_companies = 'INSERT OR IGNORE INTO companies (company_name) SELECT applicant FROM raw'
+
+# insert_into_proper = 'INSERT OR IGNORE INTO proper_drug (drug_proper_name, company_id) SELECT proper_name, comp.id FROM raw JOIN companies as comp ON comp.company_name = CAST (raw.applicant AS VARCHAR(90))'
+
+# insert_into_proprietary = 'INSERT OR IGNORE INTO proprietary_drug (drug_proprietary_name, proper_drug_id) SELECT proprietary_name, ppd.id FROM raw JOIN proper_drug as ppd ON ppd.drug_proper_name = CAST (raw.proper_name AS VARCHAR(250))'
+
+# query_list = [create_companies, create_proper, create_proprietary,
+#            insert_into_companies, insert_into_proper, insert_into_proprietary]
+
+
+# # Load the data from the CSV file
+# df = pd.read_csv('https://raw.githubusercontent.com/asugden/fast_ds/4db314b9c92adfb2f306c3d8ba745d32fd77ebca/data/fda_data.csv')
+# # Create companies dataframe
+# companies_df = df[['applicant']].drop_duplicates().copy()
+# companies_df['id'] = list(range(1, len(companies_df) + 1))
+# companies_df.reset_index(drop=True, inplace=True)
+
+# # Create proper_drug dataframe
+# proper_drug_df = df[['proper_name', 'applicant']].drop_duplicates().copy()
+# proper_drug_df = proper_drug_df.merge(companies_df, left_on='applicant', right_on='applicant', how='left')
+# proper_drug_df = proper_drug_df.rename(columns={'id': 'company_id'})
+# proper_drug_df.drop(['applicant'], axis=1, inplace=True)
+# selected_rows = proper_drug_df[proper_drug_df['company_id'] == 518]
+
+# Create proprietary_drug dataframe
+
+
+# # Create 'raw' database table
+# df.to_sql('raw', engine,
+#           if_exists='replace', index=False)
