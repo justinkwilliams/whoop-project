@@ -64,13 +64,28 @@ def df_with_features(df: pd.DataFrame, column1: str, column2: str, com_parts: li
     return df
 
 
-bins = np.arange(0, 1.1, 0.1)
+def select_bins(df: pd.DataFrame,
+                col: str,
+                n_samples: int,
+                bin_width: float = 0.1) -> pd.DataFrame:
+    """Take a dataframe and split one column into bins
+    and sample from them
 
-bins[-1] = 1
+    Args:
+        df (pd.DataFrame): input dataframe
+        col (str): the name of the dataframe column
+        n_samples (int): number of samples per bin
+        bin_width (float, optional): size of the bin. 
+            Defaults to 0.1.
 
-bin_labels = ['0.0-0.1', '0.1-0.2', '0.2-0.3', '0.3-0.4', '0.4-0.5',
-              '0.5-0.6', '0.6-0.7', '0.7-0.8', '0.8-0.9', '0.9-1.0', '1']
-
-df['bin'] = pd.cut(df[col_name], bins=bins, labels=bin_labels)
-
-sampled_df = pd.DataFrame()
+    Returns:
+        pd.DataFrame: the set of samples
+    """
+    out = []
+    bins = np.array(range(0, 1, bin_width))
+    for binmin in bins:
+        # Fencepost problem
+        binmax = binmin + bin_width
+        subdf = df.loc[df[col] >= binmin & df[col] < binmax]
+        out.append(subdf.sample(n_samples, replace=False))
+    return pd.concat(out)

@@ -61,8 +61,7 @@ def train_model(train_features: pd.DataFrame | np.ndarray, train_labels: pd.Seri
        xgboost.XGBClassifier: Trained XGBoost Classifier
 
     """
-    xgb_model = xgb.XGBClassifier(
-        objective="binary:logistic", random_state=seed)
+    xgb_model = xgb.XGBClassifier(random_state=seed)
     xgb_model.fit(train_features, train_labels)
     return xgb_model
 

@@ -39,20 +39,8 @@ X_train, X_test, y_train, y_test = split_data(
 
 # Load model
 loaded_model = pickle.load(open(
-    '/Users/user/Desktop/Real Whoop Project/whoop_project/Entity_Resolution/xgboost_class.pkl', 'rb'))
+    '/Users/user/Desktop/Real Whoop Project/whoop_project/Entity_Resolution/xgboost_classf.pkl', 'rb'))
 
 # Predict Probabilities
 
-y_proba = predict_proba(X_test)
-
-
-# Possible code for sampling rows
-# Create bins and bin labels
-bins = np.arange(0, 1.1, 0.1)
-bins[-1] = 1
-bin_labels = ['0.0-0.1', '0.1-0.2', '0.2-0.3', '0.3-0.4', '0.4-0.5',
-              '0.5-0.6', '0.6-0.7', '0.7-0.8', '0.8-0.9', '0.9-1.0', '1']
-
-df['bin'] = pd.cut(df[col_name], bins=bins, labels=bin_labels)
-
-sampled_df = pd.DataFrame()
+y_pred_proba = predict_proba(loaded_model, X_test)
