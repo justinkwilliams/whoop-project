@@ -17,8 +17,8 @@ name1 = ['Apple', 'Grape', 'turtle', 'Steelers', 'phone',
          'sun cloud rain', 'boost model fun', 'rock hard desk', 'hand on watch', 'main focus spot',
          'water great toast', 'panic fling budge', 'leave bread brave', 'pawn link say', 'low spy fit',
          'allow south arise', 'write brain clock', 'smile dance ample', 'blame gap ride', 'level chain first',
-         'Acme Corporation', 'Globex Incoporated', 'Stark Industries', 'Wayne Enterprises', 'Umbrella Corporation',
-         'Cyberdyne Systems', 'InGen Corporation', 'Weyland-Yutani Corporation', 'Oscorp Industries', 'Aperture Science',
+         'Acme Corporation LP', 'Globex LLC', 'Stark Industries LLC', 'Wayne Enterprises', 'Umbrella Corporation',
+         'Cyberdyne Systems', 'InGen Corporation', 'Weyland-Yutani', 'Oscorp Industries', 'Aperture Science',
          ]
 
 name2 = ['Apple', 'Grape', 'turtle', 'Steelers', 'phone',
@@ -33,8 +33,8 @@ name2 = ['Apple', 'Grape', 'turtle', 'Steelers', 'phone',
          'Sun Cloud Rain', 'boost Model fun', 'rock hard Desk', 'Hand On Watch', 'main Focus Spot',
          'craft croud fourm', 'rise hron shed', 'young float image', 'nut tread player', 'drop feed dark',
          'wallow sort argue', 'wright brow clerk', 'sample dance angel', 'brake rap role', 'metal cabin fruit',
-         'Acme Corp', 'Globex Inc', 'Stark Industries', 'Wayne Ent', 'Umbrella Corp',
-         'Cyberdyne Systems', 'inGen corporation', 'Weyland-Yutani', 'Oscorp Industries', 'Aperture Science corp'
+         'Acme Corp Limited Partnership', 'Globex Limited Liability Co.', 'Stark Industries Limited Liability Co', 'Wayne Enterprises International', 'Umbrella Corp LLC',
+         'Cyberdyne Systems US', 'inGen corporation A/S', 'Weyland-Yutani Corporation', 'Oscorp Industries Public Company', 'Aperture Science corp llc'
          ]
 
 ismatch = [1, 1, 1, 1, 1,
@@ -71,10 +71,20 @@ X_train, X_test, y_train, y_test = split_data(
 xgb_model = train_model(X_train, y_train, seed)
 
 # Save the trained model
-filename = 'xgboost_classf.pkl'
+filename = 'xgboost_classf2.pkl'
 pickle.dump(xgb_model, open(filename, 'wb'))
 
 # Predict probabilities
 y_pred_proba = predict_proba(xgb_model, X_test)
 
-y_pred_proba
+df_with_proba = pd.DataFrame(X_test)
+df_with_proba['ismatch'] = y_test
+test_index = df_with_proba.index
+names_df = df.loc[test_index]
+df_with_proba = pd.concat([df_with_proba, names_df], axis=0)
+df_with_proba = df_with_proba.iloc[21:]
+proba_df_reset = df_with_proba.reset_index(drop=True)
+
+just_proba = pd.DataFrame(y_pred_proba, columns=['proba'])
+proba_df_reset = pd.concat([proba_df_reset, just_proba], axis=1)
+proba_df_reset
